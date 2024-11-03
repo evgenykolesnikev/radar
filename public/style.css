@@ -1,0 +1,40 @@
+body {
+  font-family: "Courier New", Courier, monospace;
+}
+
+#plot {
+  width: 800px;
+  height: 600px;
+  margin: 50px auto 0 auto;
+}
+
+.box {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+#radarConfigForm {
+  width: 80%;
+  margin: 20px auto 0 auto;
+  padding: 20px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  width: 800px;
+}
+
+
+.inputsBox {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-evenly;
+}
+
+.inputContainer {
+  width: 250px;
+}
+
+.inputContainer > * {
+  display: block;
+  margin-bottom: 10px;
+}

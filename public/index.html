@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en/ua">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Radar</title>
+
+    <script
+      src="https://cdn.plot.ly/plotly-2.35.2.min.js"
+      charset="utf-8"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="plot" class="box"></div>
+
+    <form id="radarConfigForm" class="box">
+      <div class="inputsBox">
+        <div class="inputContainer">
+          <label for="measurementsPerRotation">Кількість вимірювань на один оберт (рази):</label>
+          <input type="text" id="measurementsPerRotation" name="measurementsPerRotation" />
+        </div>
+
+        <div class="inputContainer">
+          <label for="rotationSpeed">Швидкість обертання (RPM):</label>
+          <input type="text" id="rotationSpeed" name="rotationSpeed" />
+        </div>
+
+        <div class="inputContainer">
+          <label for="targetSpeed">Швидкість цілей (км/год):</label>
+          <input type="text" id="targetSpeed" name="targetSpeed" />
+        </div>
+      </div>
+
+      <button type="submit">Надіслати</button>
+    </form>
+
+    <button id="saveTracesButton">Зберегти трейс</button>
+    <textarea id="traceOutput" rows="10" cols="30" placeholder="Трейси будуть відображені тут..."></textarea>
+
+    <script type="module">
+      import { RadarService } from "/src/RadarService.js";
+      import { RadarGraph } from "/src/RadarGraph.js";
+      import { RadarConfig } from "/src/RadarConfig.js";
+
+      let radarServiceProps = {
+        configUrl: "http://localhost:3000/api/config",
+        socketUrl: "ws://localhost:4000",
+        eventName: "radarDataReceived",
+      };
+
+      const radarService = new RadarService(radarServiceProps);
+
+      let radarGraphProps = {
+        plotId: "plot",
+        eventName: "radarDataReceived",
+      };
+
+      const radarGraph = new RadarGraph(radarGraphProps);
+
+      const formElement = document.getElementById("radarConfigForm");
+
+      const radarConfig = new RadarConfig(formElement, function (formData) {
+        radarService.updateConfiguration(formData).then(()=>{radarConfig.setConfig(radarService.config)})
+      });
+
+      async function main() {
+        await radarService.fetchConfiguration();
+        radarService.connectWebSocket();
+        radarGraph.init(radarService.config);
+        radarConfig.setConfig(radarService.config);
+      }
+
+      $(document).ready(function () {
+        main();
+      });
+    </script>
+  </body>
+</html>
